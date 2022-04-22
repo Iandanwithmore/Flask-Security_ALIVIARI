@@ -1,0 +1,47 @@
+<!DOCTYPE html moznomarginboxes mozdisallowselectionprint>
+<html lang="en">
+  <head>
+  <title>{{title}}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/grid.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/java.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/custom-popup.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/components/custom-alert.js') }}"></script>
+    <meta name="description" content={{description}}>
+    <link rel="shortcut icon" href="/favicon.ico">
+    {% block css %}{% endblock %}
+  </head>
+  <body>
+  <main>
+    {% include '/components/nav.html' %}
+      <hr class="mb-3">
+    
+    <div class="d-flex justify-content-center">
+      <div id="submit_loader" class="loadingOuter d-none">
+        <div class="loadingInner"></div>
+      </div>
+    </div>
+  
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div>
+        <div class="d-flex justify-content-between alert">
+          <strong>ELIMINAR NOTIFICACIONES!</strong>
+          <span class="closebtn" onclick="f_delete__parent(this.parentNode, 'ELIMINAR NOTIFICACIONES!');">&times;</span> 
+        </div>
+        {% for category, message in messages %}
+          <div class="d-flex justify-content-between alert alert-{{ category }}">
+            <p><strong>{{ category }}!</strong> {{ message }}</p>
+            <span class="closebtn" onclick="f_delete__parent(this, '{{ message }}');">&times;</span> 
+          </div>
+        {% endfor %}
+      </div>  
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+  </body>
+  {% block script %}{% endblock %}
+  {% block data %}{% endblock %}
+</html>

@@ -1,0 +1,55 @@
+<div class="mb-3">
+    <div class="main-title" for="header_detail" onClick="f_show__detail(this);return false;">
+        Detalle Actividad {{saData['CCODACT']}} <custom-popup><span slot="msg">Click me!</span></custom-popup>
+    </div>
+    <div class="d-none" id="header_detail">
+    <fieldset><legend>Persona</legend>
+        <div class="row">
+        <div class="col-md-2 col-sm-6">NRO.DOC:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CDESDOC']}}</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CNRODOC']}}</div>
+            <div class="col-md-2 col-sm-6">CNOMBRES:</div>
+            <div class="border-bottom col-md-4 col-sm-6">{{saData['CNOMBRE']}}</div>
+        </div>
+    </fieldset>
+
+    <fieldset><legend>Actividad</legend>
+        <div class="row">
+            <div class="col-md-2 col-sm-6">ESTADO:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CDESEST']}}</div>
+            <div class="col-md-2 col-sm-6">INICIO:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['TATENCI']}}</div>
+            <div class="col-md-2 col-sm-6">FIN:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['TFIN']}}</div>
+        </div>
+    </fieldset>
+
+    <fieldset><legend>Plan</legend>
+        <div class="row">
+            <div class="col-md-2 col-sm-6">ESTADO:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CDESEST']}}</div>
+            <div class="col-md-2 col-sm-6">INICIO:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['TINICIO']}}</div>
+            <div class="col-md-2 col-sm-6">FIN:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['TFINPLA']}}</div>
+        </div>
+        <div class="row">
+            <div class="col-md-2 col-sm-3">PERFIL:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CDESPER']}}</div>
+            <div class="col-md-2 col-sm-3">TIPO:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CDESTIP']}}</div>
+            <div class="col-md-2 col-sm-3">BAUCHER:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CVAUCHE']}}</div>
+        </div>
+    </fieldset>
+
+    <fieldset><legend>Empresa</legend>
+        <div class="row">
+            <div class="col-md-2 col-sm-6">RUC:</div>
+            <div class="border-bottom col-md-2 col-sm-6">{{saData['CNRORUC']}}</div>
+            <div class="col-md-2 col-sm-6">EMPRESA:</div>
+            <div class="border-bottom col-md-6 col-sm-6">{{saData['CDESEMP']}}</div>
+        </div>
+   </fieldset>
+   </div>
+</div>

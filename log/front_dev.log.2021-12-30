@@ -1,0 +1,17 @@
+{'TIME':2021-12-30 08:35:36,664,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:09:25,795,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:09:45,680,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:10:46,258,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:12:11,754,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:12:44,833,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:12:53,034,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:12:53,555,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Restarting with stat}}
+{'TIME':2021-12-30 09:21:16,455,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{127.0.0.1 - - [30/Dec/2021 09:21:16] "[33mGET / HTTP/1.1[0m" 404 -}}
+{'TIME':2021-12-30 09:21:16,501,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{127.0.0.1 - - [30/Dec/2021 09:21:16] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -}}
+{'TIME':2021-12-30 09:21:28,402,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{127.0.0.1 - - [30/Dec/2021 09:21:28] "[33mGET / HTTP/1.1[0m" 404 -}}
+{'TIME':2021-12-30 09:22:42,151,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)}}
+{'TIME':2021-12-30 09:23:22,556,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{127.0.0.1 - - [30/Dec/2021 09:23:22] "[33mGET / HTTP/1.1[0m" 404 -}}
+{'TIME':2021-12-30 09:31:42,481,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)}}
+{'TIME':2021-12-30 09:39:37,860,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)}}
+{'TIME':2021-12-30 09:45:10,375,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{ * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)}}
+{'TIME':2021-12-30 09:45:32,226,'ADDRESS':'None','URL': 'None','TYPE':'INFO','MODULE':'_internal','MSG':{127.0.0.1 - - [30/Dec/2021 09:45:32] "[33mGET / HTTP/1.1[0m" 404 -}}

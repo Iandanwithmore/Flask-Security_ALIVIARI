@@ -1,0 +1,27 @@
+{% extends '/components/layout.html' %}
+{% block css %}
+  <script src="{{ url_for('static', filename='js/components/custom-asvg.js') }}"></script>
+  <style>
+    .main-wrap{
+      margin:var(--m-1);
+      display: flex;
+      gap:1rem;
+      flex-wrap:wrap;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="main-wrap">
+  {% for laFila in saDatos %}
+    <custom-asvg 
+      text="{{laFila['CDESCRI']}}"
+      ref="{{laFila['CCODOPC']}}"
+      svg="{{laFila['CSVGPAT']}}"
+    ></custom-asvg>
+  {%endfor%}
+  </div>
+{% endblock %}

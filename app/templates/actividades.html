@@ -1,0 +1,148 @@
+{% extends '/components/layout.html' %}
+{% block css %}
+  <style>
+  .wrap{
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    gap:0.5rem;
+    background: var(--container-color);
+  }
+
+  .wrap__head{
+    width: 5%;
+  }
+
+  .wrap__content{
+    width: 75%;
+    justify-content: center;
+  }
+
+  .wrap__actions{
+    width: 20%;
+    display:flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .check{
+    fill: var(--body-color);
+  }
+
+  .wrap:hover,
+  .wrap-active{
+    border: 1px solid var(--blue);
+  }
+
+  .wrap:hover > .wrap__head,
+  .wrap-active > .wrap__head{
+    background: var(--blue);
+    color: var(--text-color);
+  }
+
+  .wrap__head {
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--body-color);
+    border-radius: var(--border-radius);
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+
+  @media (max-width: 641px) {
+    .wrap {
+      flex-direction: column;
+      justify-content: center;
+    }
+    .wrap__head, .wrap__content, .wrap__actions{
+      width: 100%;
+      flex-direction: column;
+      justify-content: center;
+      gap:0.5rem;
+    }
+    .btn{
+      width: 100%;
+    }
+  }
+
+  </style>
+{% endblock %}
+
+{% block content %}
+<div class="row align-items-center justify-content-between">
+  <form method="get" action="{{url_for('Actividad.actividades',pcTipSer=request.path.split('/')[2])}}" class="col-8 row align-items-center mb-0">
+      <input type="text" value="{{saData['DINIACT']}}" name="{{'DINIACT'}}" class="col-5" maxlength="10" placeholder="DIA INICIO">
+      <input type="text" value="{{saData['DFINACT']}}" name="{{'DFINACT'}}" class="col-5" maxlength="10" placeholder="DIA FIN">
+      <button class="btn btn-info col-2" type="submit">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M10 11H7.101l.001-.009a4.956 4.956 0 0 1 .752-1.787 5.054 5.054 0 0 1 2.2-1.811c.302-.128.617-.226.938-.291a5.078 5.078 0 0 1 2.018 0 4.978 4.978 0 0 1 2.525 1.361l1.416-1.412a7.036 7.036 0 0 0-2.224-1.501 6.921 6.921 0 0 0-1.315-.408 7.079 7.079 0 0 0-2.819 0 6.94 6.94 0 0 0-1.316.409 7.04 7.04 0 0 0-3.08 2.534 6.978 6.978 0 0 0-1.054 2.505c-.028.135-.043.273-.063.41H2l4 4 4-4zm4 2h2.899l-.001.008a4.976 4.976 0 0 1-2.103 3.138 4.943 4.943 0 0 1-1.787.752 5.073 5.073 0 0 1-2.017 0 4.956 4.956 0 0 1-1.787-.752 5.072 5.072 0 0 1-.74-.61L7.05 16.95a7.032 7.032 0 0 0 2.225 1.5c.424.18.867.317 1.315.408a7.07 7.07 0 0 0 2.818 0 7.031 7.031 0 0 0 4.395-2.945 6.974 6.974 0 0 0 1.053-2.503c.027-.135.043-.273.063-.41H22l-4-4-4 4z"></path></svg>
+      </button>
+  </form>
+  <form method="get" action="{{url_for('Actividad.zip_actividad',pcTipSer=request.path.split('/')[2])}}" class="col-4 row mb-0 d-flex justify-content-end">
+    <input type="hidden" id="pnIndice" name="pnIndice">
+    <button class="btn btn-info" type="submit">
+      Zip
+    </button>
+  </form>
+</div>
+<hr class="mb-3">
+<div>
+{% for laFila in saDatos %}
+  <div class="wrap m-2 p-2">
+    <spam class="wrap__head " onclick="check_item(this,{{loop.index-1}});return false;">{{loop.index}}</spam>
+    <div class="wrap__content">
+      <div class="d-flex justify-content-around align-items-center">
+        {{laFila['CDESDOC']}}-{{laFila['CNRODOC']}}
+        {{laFila['CCODACT']}}
+        <spam class="alert 
+        {% if laFila['CESTADO'] == 'E' %}
+          alert-info
+        {% elif laFila['CESTADO'] == 'A' %}
+          alert-warning
+        {% elif laFila['CESTADO'] == 'F' %}
+          alert-success
+        {% endif %}
+        mb-0">{{laFila['CDESEST']}}</spam>
+        <spam class="alert alert-normal mb-0" >{{laFila['CDESTIP']}}</spam>
+      </div>
+      <div>{{laFila['CDESEMP'][0:50]}}</div>
+    </div>
+    <div class="wrap__actions">
+      {% if laFila['CARCHIV'] == 'S' %}
+        <a class="btn" href="{{url_for('Actividad.pdf_actividad',pcTipSer=request.path.split('/')[2],pnIndice=loop.index-1)}}">
+          <svg width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M8.267 14.68c-.184 0-.308.018-.372.036v1.178c.076.018.171.023.302.023.479 0 .774-.242.774-.651 0-.366-.254-.586-.704-.586zm3.487.012c-.2 0-.33.018-.407.036v2.61c.077.018.201.018.313.018.817.006 1.349-.444 1.349-1.396.006-.83-.479-1.268-1.255-1.268z"></path><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM9.498 16.19c-.309.29-.765.42-1.296.42a2.23 2.23 0 0 1-.308-.018v1.426H7v-3.936A7.558 7.558 0 0 1 8.219 14c.557 0 .953.106 1.22.319.254.202.426.533.426.923-.001.392-.131.723-.367.948zm3.807 1.355c-.42.349-1.059.515-1.84.515-.468 0-.799-.03-1.024-.06v-3.917A7.947 7.947 0 0 1 11.66 14c.757 0 1.249.136 1.633.426.415.308.675.799.675 1.504 0 .763-.279 1.29-.663 1.615zM17 14.77h-1.532v.911H16.9v.734h-1.432v1.604h-.906V14.03H17v.74zM14 9h-1V4l5 5h-4z"></path></svg>
+        </a>
+      {% else %}
+        N/A
+      {% endif %}
+      <a class="btn" href="{{url_for('Actividad.detalleActividad',pcTipSer=request.path.split('/')[2],pnIndice=loop.index-1)}}">
+        <svg width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M10 3H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zM9 9H5V5h4v4zm11-6h-6a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4a1 1 0 0 0-1-1zm-1 6h-4V5h4v4zm-9 4H4a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1zm-1 6H5v-4h4v4zm8-6c-2.206 0-4 1.794-4 4s1.794 4 4 4 4-1.794 4-4-1.794-4-4-4zm0 6c-1.103 0-2-.897-2-2s.897-2 2-2 2 .897 2 2-.897 2-2 2z"></path></svg>
+      </a>
+    </div>
+  </div>
+{%endfor%}
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+  function check_item(e,indice){
+    let found = null;
+    var lnIndice = document.getElementById('pnIndice');
+    lista_indices = lnIndice.value.length?lnIndice.value.split(','):[];
+    lista_indices.forEach(function(e, i){
+      if (e == indice){
+        found = i;
+      }
+    })
+    if (found == null){
+      lista_indices.push(indice);
+      e.parentNode.classList.add("wrap-active");
+    }else if (found > -1){
+      lista_indices.splice(found, 1);
+      e.parentNode.classList.remove("wrap-active");
+    }
+    lnIndice.value = lista_indices;
+  }
+</script>
+{% endblock %}

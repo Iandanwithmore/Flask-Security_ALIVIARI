@@ -1,0 +1,17 @@
+<input type="radio" id="person" name="accordion" checked="checked"/>
+<label class="item" for="person">
+    <div class="title">Persona</div>
+    <div class="content">
+        <div class="row">
+            <div class="col-md-3 col-sm-6">TIPO:</div>
+            <div class="border-bottom col-md-3 col-sm-6">{{saPersona['CDESDOC']}}</div>
+            <div class="col-md-3 col-sm-6">NRO.DOC:</div>
+            <div class="border-bottom col-md-3 col-sm-6">{{saPersona['CNRODOC']}}</div>
+        </div>
+        <div class="row">
+            <div class="col-3">CNOMBRES:</div>
+            <div class="border-bottom col-6">{{saPersona['CNOMBRES']}}</div>
+        </div>
+    </div>
+</label>
+

@@ -1,0 +1,519 @@
+{% extends '/components/layout.html' %}
+{% block css %}
+<style>
+.wrap-check{
+  display: block;
+  min-height: 1.5rem;
+  padding-left: 1.5em;
+  margin-bottom: .125rem;
+}
+.wrap-check>input:checked[type="checkbox"]{
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+}
+.wrap-check>input:checked {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+.wrap-check>input[type="checkbox"] {
+  border-radius: .25em;
+}
+.wrap-check>input {
+  float: left;
+  margin-left: -1.5em;
+}
+.wrap-check>input {
+  width: 1em;
+  height: 1em;
+  margin-top: .25em;
+  vertical-align: top;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  border: 1px solid rgba(0,0,0,.25);
+    border-top-color: rgba(0, 0, 0, 0.25);
+    border-right-color: rgba(0, 0, 0, 0.25);
+    border-bottom-color: rgba(0, 0, 0, 0.25);
+    border-left-color: rgba(0, 0, 0, 0.25);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-print-color-adjust: exact;
+  color-adjust: exact;
+}
+.wrap-check>label{
+  display: inline-block;
+}
+</style>
+{% endblock %}
+{% block content %}
+<section id="main" class="main w-100">
+  {% include '/components/header.html' %}
+  <div class="row">
+    <div class="col-md-8 col-sm-12 main-title">Datos</div>
+    <div class="col-md-4 col-sm-12 row">
+      <button class="col-6 btn btn-info" type="button" onClick="csv_hematology();return false;">
+        Val.Pred.
+      </button>
+      <button class="col-6 btn btn-info open-modal" type="button" data-open="modal_examenes" onClick="load_actividades();return false;">
+        Ver Examenes
+      </button>
+    </div>  
+  </div>
+  
+  <form class="form" id="p_mdatos">
+
+  <div class="container">
+    {% set id = namespace(value=0) %}
+    {% for laDatos in saDatos %}
+      <fieldset class="row align-items-center w-100 m-0 pb-2 mb-3" id ="{{loop.index0}}">
+      {% for laFila in laDatos %}
+        {% if loop.index0 == 0 %}
+          <legend>{{laFila['CTITULO'] or "TITULO"}}</legend>
+        {% endif %}
+
+        {% if laFila['FHTML'] == 'I'%}
+          <div class="col-12">
+            <label for="{{laFila['CCODIND']}}">{{laFila['CIMPRIM']}}</label>
+            <input id="{{laFila['CCODIND']}}" name="{{laFila['CCODIND']}}" value="{{laFila['CRESULT']}}" type="text" 
+            {% if laFila['CESTADO'] == 'I'%}
+              disabled 
+            {% endif%}>
+            <div id="valpre_{{laFila['CCODIND']}}" class="hidden">{{laFila['CVALPRE']}}</div>
+          </div>
+        {% elif laFila['FHTML'] == 'N'%}
+          <div class="col-3">
+            <label for="{{laFila['CCODIND']}}">{{laFila['CIMPRIM']}}</label>
+            <input id="{{laFila['CCODIND']}}" name="{{laFila['CCODIND']}}" value="{{laFila['CRESULT']}}" type="number" 
+            {% if laFila['CESTADO'] == 'I'%} 
+              disabled 
+            {% endif%}>
+            <spam>{{laFila['CDESUNI']}}</spam>
+            <div id="valpre_{{laFila['CCODIND']}}" class="hidden">{{laFila['CVALPRE']}}</div>
+          </div>
+        {% elif laFila['FHTML'] == 'B'%}
+            <div class="col-4">
+              <div class="wrap-check">
+              <label for="{{laFila['CCODIND']}}">{{laFila['CIMPRIM']}}</label>
+              <input id="{{laFila['CCODIND']}}" name="{{laFila['CCODIND']}}" type="checkbox" onChange="f_check(this);return false;"
+              {% if laFila['NOPCION'] != 0 %}
+                checked
+              {% endif %} 
+              {% if laFila['CESTADO'] == 'I' %}
+                disabled 
+              {% endif %}/>
+              </div>
+            </div>
+        {%  elif laFila['FHTML'] == 'S'%}
+            <div class="col-4">
+              <label for="{{laFila['CCODIND']}}">{{laFila['CIMPRIM']}}</label>
+              <select id="{{laFila['CCODIND']}}" name="{{laFila['CCODIND']}}" 
+                {% if laFila['CESTADO'] == 'I'%}
+                  disabled 
+                {% endif %}>
+                <option value="" selected disabled>Seleccione</option>
+                {% for laFila2 in laFila['MTABLA'] %}
+                  <option value={{laFila2['CCODIGO']}}
+                  {% if laFila2['CDESCRI'] |int == laFila['CRESULT']%}
+                    selected
+                  {% endif %}
+                  >{{laFila2['CDESCRI']}}</option>
+                {% endfor %}
+              </select>
+              <div id="valpre_{{laFila['CCODIND']}}" class="hidden">{{laFila['CVALPRE']}}</div>
+            </div>
+        {% endif %}
+        {% set id.value = id.value + 1%}
+      {% endfor %}
+      </fieldset>
+    {% endfor %}
+
+    {%if saData['TATENCI']%}
+    <div class="d-flex justify-content-between">
+      <div>Dia Atencion</div>
+      <div>Activar?<input type="checkbox" for="p_tAtenci" onchange="f_activate__check(this);" checked></div>
+    </div>
+    <input name="TATENCI" value="{{saData['TATENCI'][:10]}}T{{saData['TATENCI'][11:16]}}" id="p_tAtenci" type="datetime-local" min="2022-06-07T00:00">
+    {%else%}
+    <div class="d-flex justify-content-between">
+      <div>Dia Atencion</div>
+      <div>Activar?<input type="checkbox" for="p_tAtenci" onchange="f_activate__check(this);"></div>
+    </div>
+    <input name="TATENCI" id="p_tAtenci" type="datetime-local" min="2022-06-07T00:00" disabled>
+    {%endif%}
+
+    {%if saExtra['COBSERV']%}
+    <div class="d-flex justify-content-between">
+      <div>Observacion</div>
+      <div>Activar?<input type="checkbox" for="p_cObserv" onchange="f_activate__check(this);" checked></div>
+    </div>
+    <input name="COBSERV" value="{{saExtra['COBSERV']}}" id="p_cObserv" type="text">
+    {%else%}
+    <div class="d-flex justify-content-between">
+      <div>Observacion</div>
+      <div>Activar?<input type="checkbox" for="p_cObserv" onchange="f_activate__check(this);"></div>
+    </div>
+    <input name="COBSERV" id="p_cObserv" type="text" disabled>
+    {%endif%}
+
+
+    {%if saExtra['CRECOME']%}
+    <div class="d-flex justify-content-between">
+      <div>Recomendacion</div>
+      <div>Activar?<input type="checkbox" for="p_cRecome" onchange="f_activate__check(this);" checked></div>
+    </div>
+    <input name="CRECOME" value="{{saExtra['CRECOME']}}" id="p_cRecome" type="text">
+    {%else%}
+    <div class="d-flex justify-content-between">
+      <div>Recomendacion</div>
+      <div>Activar?<input type="checkbox" for="p_cRecome" onchange="f_activate__check(this);"></div>
+    </div>
+    <input name="CRECOME" id="p_cRecome" type="text" disabled>
+    {%endif%}
+
+    {%if saExtra['CCONCLU']%}
+    <div class="d-flex justify-content-between">
+      <div>Conclusion</div>
+      <div>Activar?<input type="checkbox" for="p_cConclu" onchange="f_activate__check(this);" checked></div>
+    </div>
+    <input name="CCONCLU" value="{{saExtra['CCONCLU']}}" id="p_cConclu" type="text">
+    {%else%}
+    <div class="d-flex justify-content-between">
+      <div>Conclusion</div>
+      <div>Activar?<input type="checkbox" for="p_cConclu" onchange="f_activate__check(this);"></div>
+    </div>
+    <input name="CCONCLU" id="p_cConclu" type="text" disabled>
+    {%endif%}
+
+    <hr>
+    <div class="row">
+      <div class="col-md-4 input-svg__left">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M10 18a7.952 7.952 0 0 0 4.897-1.688l4.396 4.396 1.414-1.414-4.396-4.396A7.952 7.952 0 0 0 18 10c0-4.411-3.589-8-8-8s-8 3.589-8 8 3.589 8 8 8zm0-14c3.309 0 6 2.691 6 6s-2.691 6-6 6-6-2.691-6-6 2.691-6 6-6z"></path></svg>
+          <input id="buscar_cie10" placeholder="Buscar Cie10" type="text">
+      </div>
+      <button class="col-md-2 btn btn-info" type="button" onClick="f_buscar(this,'/buscar/', 'cie10');return false;">
+        Buscar
+      </button>
+      
+      <div class="col-md-4">
+        <input id="select_cie10" list="datalist_cie10" autocomplete="off" placeholder="SIN DATOS!!" type="text">
+        <datalist id="datalist_cie10">
+        </datalist>
+        <button class="clear-icon" type="button" for="select_cie10" onclick="document.getElementById('select_cie10').value = ''"></button>  
+      </div>
+      <button class="col-md-2 btn btn-info" type="button" onClick="f_agregar('/agregar/', 'cie10');return false;">
+        Agregar
+      </button>
+    </div>
+    <fieldset id="datos_cie10" class="row mb-2"><legend>Cie10</legend>
+    {% if saCie10 and saCie10 is defined and saCie10|length > 0 %}
+      {% for laFila in saCie10 %}
+        <div class="d-flex justify-content-between alert alert-info">
+          <p><strong>{{laFila['CCODIGO']}}!</strong> {{laFila['CDESCRI']}}</p>
+          <span class="closebtn" onclick="f_quitar('/quitar/','{{loop.index-1}}', 'cie10');return false;">&times;</span> 
+        </div>
+      {% endfor%}
+    {% endif %}
+    </fieldset>
+    <hr>
+
+     <div class="row  footer">
+      <button class="col-6 btn" value="N" name="CGRABAR" type="button" onClick="f_grabar();return false;">
+        <svg viewBox="0 0 24 24" width="24" height="24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M5 21h14a2 2 0 0 0 2-2V8a1 1 0 0 0-.29-.71l-4-4A1 1 0 0 0 16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2zm10-2H9v-5h6zM13 7h-2V5h2zM5 5h2v4h8V5h.59L19 8.41V19h-2v-5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v5H5z"></path></svg>
+      </button>
+      <button class="col-6 btn" value="S" name="CGRABAR" type="button">
+        <svg width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M20 4H6c-1.103 0-2 .897-2 2v5h2V8l6.4 4.8a1.001 1.001 0 0 0 1.2 0L20 8v9h-8v2h8c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zm-7 6.75L6.666 6h12.668L13 10.75z"></path><path d="M2 12h7v2H2zm2 3h6v2H4zm3 3h4v2H7z"></path></svg>
+      </button>
+    </div>
+
+  </div>
+  </form>
+</section>
+
+<div class="modal" id="modal_examen" data-animation="slideInOutLeft">
+  <div class="modal-dialog w-75">
+    <header class="modal-header">
+      The header of the first modal
+      <button class="close-modal" aria-label="close modal" data-close>
+        ✕  
+      </button>
+    </header>
+    <section id="modal_examen_content" class="modal-content">
+      
+    </section>
+    <footer class="modal-footer">
+      The footer of the first modal
+    </footer>
+  </div>
+</div>
+
+{% endblock %}
+{% block script %}
+<script>
+//MODAL
+
+const openEls = document.querySelectorAll("[data-open]");
+const closeEls = document.querySelectorAll("[data-close]");
+const isVisible = "is-visible";
+
+for (const el of openEls) {
+  el.addEventListener("click", function() {
+    const modalId = this.dataset.open;
+    document.getElementById(modalId).classList.add(isVisible);
+  });
+}
+
+for (const el of closeEls) {
+  el.addEventListener("click", function() {
+    this.parentElement.parentElement.parentElement.classList.remove(isVisible);
+  });
+}
+
+document.addEventListener("click", e => {
+  if (e.target == document.querySelector(".modal.is-visible")) {
+    document.querySelector(".modal.is-visible [data-close]").click();
+  }
+});
+
+document.addEventListener("keyup", e => {
+  // if we press the ESC
+  if (e.key == "Escape" && document.querySelector(".modal.is-visible")) {
+    document.querySelector(".modal.is-visible [data-close]").click();
+  }
+});
+
+function csv_hematology(){
+  let data_csv = prompt("Copie Fila csv").replace(/['"]+/g, '');
+  console.log(data_csv);
+  if (data_csv != null || data_csv != "") {
+    let data_array = data_csv.split(",");
+    console.info(data_array);
+    document.getElementById("L001").value = data_array[8];
+    document.getElementById("L002").value = data_array[9];
+    document.getElementById("L003").value = data_array[10];
+    document.getElementById("L004").value = data_array[11];
+    document.getElementById("L005").value = data_array[12];
+    document.getElementById("L006").value = data_array[13];
+    document.getElementById("L007").value = data_array[14];
+    document.getElementById("L008").value = data_array[15];
+    document.getElementById("L012").value = data_array[16];
+    document.getElementById("L009").value = data_array[17];
+    document.getElementById("L010").value = data_array[18];
+    document.getElementById("L015").value = data_array[19];
+    document.getElementById("L016").value = data_array[20];
+    document.getElementById("L017").value = data_array[21];
+    document.getElementById("L018").value = data_array[22];
+    document.getElementById("L019").value = data_array[23];
+    document.getElementById("L020").value = data_array[24];
+    document.getElementById("L021").value = data_array[25];
+    document.getElementById("L022").value = data_array[26];
+    document.getElementById("L023").value = data_array[27];
+    document.getElementById("L024").value = data_array[28];
+    document.getElementById("L025").value = data_array[29];
+  }
+}
+
+function load_valpre(){
+  var elements = document.getElementById("p_mdatos").elements;
+  for (var i = 0, element; element = elements[i++];) {
+    let val_pre = 0;
+    id_element = "valpre_"+element.id;
+    try{
+      val_pre = document.getElementById(id_element).textContent;
+    }catch(e){
+      continue;
+    }
+    if (element.tagName == "INPUT") {
+        if (element.type == "text") {
+          document.getElementById(element.id).value = val_pre;
+        }
+        else if (element.type == "checkbox") {
+          document.getElementById(element.id).checked = val_pre == 1? true:false ;      
+        }
+        else if (element.type == "radio") {
+          document.getElementById(element.id)[val_pre].checked = true;      
+        }
+    }
+    if (element.tagName == "SELECT") {
+      document.getElementById(element.id).selectedIndex = parseInt(val_pre);
+    }
+  }
+}
+
+function load_actividades() {
+  fetch(window.origin+'/plan/hoja_ruta', {
+    method: "GET",
+    credentials: "include",
+    cache: "no-cache"
+  })
+    .then(async response => {
+        const isJson = response.headers.get('content-type')?.includes('application/json');
+        const data = isJson ? await response.json() : null;
+        if (!response.ok || !data.OK) {
+            const error = data.DATA || response.status;
+            return Promise.reject(error);
+        }
+        document.getElementById('modal_examen_content').innerHTML = '';
+        data.DATA.forEach(function (e, i) {
+          load__modal(e, i)
+        });
+        document.getElementById('modal_examen').classList.add("is-visible");
+    })
+    .catch(error => {
+        console.error('ERROR!', error);
+    });
+}
+
+function f_buscar(e, url, html__node) {
+  var lselect = document.getElementById('select_'+html__node);
+  lselect.placeholder = 'SIN DATOS!!';
+  lselect.classList.remove("b-info");
+  let lcBuscar= document.getElementById('buscar_'+html__node).value;
+  ruta = window.origin+url+html__node+'/'+lcBuscar.toUpperCase();
+  console.info(ruta)
+  fetch(ruta, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-cache"
+  })
+    .then(async response => {
+        const isJson = response.headers.get('content-type')?.includes('application/json');
+        const data = isJson ? await response.json() : null;
+        if (!response.ok || !data.OK) {
+            const error = data.DATA || response.status;
+            return Promise.reject(error);
+        }
+        var loptions = document.getElementById('datalist_'+html__node)
+        loptions.innerHTML = '';
+        data.DATA.forEach(function (e, i) {
+          var option = document.createElement("option");
+          option.text = i+','+e.CDESCRI;
+          loptions.appendChild(option);
+        });
+        lselect.placeholder = 'BUSCAR...';
+        lselect.classList.add("b-info");
+    })
+    .catch(error => {
+        console.error('ERROR!', error);
+        alert(error)
+    });
+}
+
+function f_agregar(url, html__node) {
+  let lidx= document.getElementById('select_'+html__node).value.split(',')[0];
+  if (lidx === '' || lidx === null || lidx === undefined) {
+    alert('ERROR VALOR NO SELECCIONADO');
+    return;
+  }else{
+    ruta = window.origin+url+html__node+'/'+lidx;
+    console.info(ruta)
+    fetch(ruta, {
+    method: "POST",
+    credentials: "include",
+    cache: "no-cache"
+    })
+      .then(async response => {
+          const isJson = response.headers.get('content-type')?.includes('application/json');
+          const data = isJson ? await response.json() : null;
+          if (!response.ok || !data.OK) {
+              const error = data.DATA || response.status;
+              return Promise.reject(error);
+          }
+          console.info(data);
+          document.getElementById('datos_'+html__node).innerHTML = '<legend>Cie10</legend>';
+          data.DATA.forEach(function (e, i) {
+            load__html(e, i,html__node);
+          });
+      })
+      .catch(error => {
+          console.error('ERROR!', error);
+      });
+  }
+}
+
+function load__html(data, idx=0, html__node){
+  const layout_container = `
+  <div class="d-flex justify-content-between alert alert-info">
+    <p><strong>${data['CCODIGO']}!</strong> ${data['CDESCRI']}</p>
+    <span class="closebtn" onclick="f_quitar('/quitar/','${idx}', '${html__node}');return false;">&times;</span> 
+  </div>
+  `;
+  document.getElementById('datos_'+html__node).innerHTML += layout_container;
+}
+
+function load__modal(data, idx){
+  let laestados = {"F":"FINALIZADO", "A":"ATENDIDO", "E":"PENDIENTE","X":"N/A"};
+  let laclasest = {"F":"successs", "A":"warning", "E":"info", "X":""};
+  lidx = data['CESTADO']?data['CESTADO']:'X';
+  lcestado = laestados[lidx];
+  lclasest = laestados[lidx];
+  let loPdf = '<spam class="col-2">N/A</spam>'
+  if (data['CARCHIV'] == 'S'){
+    url = window.origin+'/PDF/'+data['CNRODNI']+'/'+data['CCODACT']
+    loPdf = `<a class="col-2 btn" href="${url}"
+              <svg width="24" height="24" viewBox="0 0 24 24" style="fill: rgba(0, 0, 0, 1);transform: ;msFilter:;"><path d="M8.267 14.68c-.184 0-.308.018-.372.036v1.178c.076.018.171.023.302.023.479 0 .774-.242.774-.651 0-.366-.254-.586-.704-.586zm3.487.012c-.2 0-.33.018-.407.036v2.61c.077.018.201.018.313.018.817.006 1.349-.444 1.349-1.396.006-.83-.479-1.268-1.255-1.268z"></path><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zM9.498 16.19c-.309.29-.765.42-1.296.42a2.23 2.23 0 0 1-.308-.018v1.426H7v-3.936A7.558 7.558 0 0 1 8.219 14c.557 0 .953.106 1.22.319.254.202.426.533.426.923-.001.392-.131.723-.367.948zm3.807 1.355c-.42.349-1.059.515-1.84.515-.468 0-.799-.03-1.024-.06v-3.917A7.947 7.947 0 0 1 11.66 14c.757 0 1.249.136 1.633.426.415.308.675.799.675 1.504 0 .763-.279 1.29-.663 1.615zM17 14.77h-1.532v.911H16.9v.734h-1.432v1.604h-.906V14.03H17v.74zM14 9h-1V4l5 5h-4z"></path></svg>
+            </a>`;
+  }
+  const modal_container =`
+  <div class="row align-items-center">
+      ${loPdf}
+      <div class="col-6 border-right">${idx}-${data['CDESSER']}</div>
+      <spam class="col-2 alert-${lclasest}">${lcestado}!</spam>
+      <spam class="col-2">${data['CCODACT']}</spam>
+  </div>
+  `;
+  document.getElementById('modal_examen_content').innerHTML += modal_container;
+}
+
+function f_quitar(url, idx, html__node) {
+  ruta = window.origin+url+html__node+'/'+idx;
+  console.info(ruta)
+  fetch(ruta, {
+    method: "POST",
+    credentials: "include",
+    cache: "no-cache"
+  })
+    .then(async response => {
+      const isJson = response.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await response.json() : null;
+
+      if (!response.ok || !data.OK) {
+          const error = data.DATA || response.status;
+          return Promise.reject(error);
+      }
+      document.getElementById('datos_'+html__node).innerHTML = '<legend>Cie10</legend>';
+      data.DATA.forEach(function (e, i) {
+        load__html(e, i, html__node)
+      });
+    })
+    .catch(error => {
+        console.error('ERROR!', error);
+    });
+}
+
+function f_grabar(url) {
+  ruta = window.origin+"{{url_for('Actividad.detalleActividad',pcTipSer=request.path.split('/')[2],pnIndice=request.path.split('/')[3])}}";
+  console.info(ruta)
+  ladata = Array.from(new FormData(document.getElementById('p_mdatos')));
+  fetch(ruta, {
+    method: "POST",
+    credentials: "include",
+    cache: "no-cache",
+    body:JSON.stringify(ladata)
+  })
+    .then(async response => {
+      const isJson = response.headers.get('content-type')?.includes('application/json');
+      const data = isJson ? await response.json() : null;
+
+      if (!response.ok || !data.OK) {
+          const error = data.DATA || response.status;
+          return Promise.reject(error);
+      }
+      f_verArchivo(data.DATA);
+    })
+    .catch(error => {
+        console.error('ERROR!', error);
+    });
+}
+</script>
+{% endblock %}

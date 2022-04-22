@@ -1,0 +1,6 @@
+{% macro input(title='', name='', type='text') -%}
+<div class="input-group col-12">
+<input name="{{name}}" type="{{type}}" id="{{name}}" autocomplete="off" required>
+<label>{{title}}</label>
+</div>
+{%- endmacro %}
