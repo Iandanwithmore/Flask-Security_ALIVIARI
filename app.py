@@ -5,6 +5,7 @@ from flask_session import Session
 
 # import the application config classes
 from waitress import serve
+from flask_wtf.csrf import CSRFError
 
 app = create_app()
 
@@ -18,6 +19,9 @@ server_session.init_app(app)
 def not_found(error):
     return render_template("error/error.html", code="400", msg=error)
 
+@app.errorhandler(CSRFError)
+def handle_csrf_error(e):
+    return render_template('csrf_error.html', reason=e.description), 400
 
 # favicon
 @app.route("/favicon.ico")

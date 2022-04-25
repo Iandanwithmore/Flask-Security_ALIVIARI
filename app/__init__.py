@@ -8,6 +8,7 @@ from logging.handlers import TimedRotatingFileHandler
 
 import rsa
 from flask import Flask, has_request_context, request
+from flask_wtf.csrf import CSRFProtect
 
 from .config import DevelopmentConfig
 
@@ -16,6 +17,8 @@ def create_app(config=DevelopmentConfig):
     app = Flask(__name__)
     app.config.from_object(config)
 
+    csrf = CSRFProtect()
+    csrf.init_app(app)
     class RequestFormatter(logging.Formatter):
         def format(self, record):
             if has_request_context():

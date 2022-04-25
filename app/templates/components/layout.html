@@ -42,6 +42,13 @@
     {% block content %}{% endblock %}
   </main>
   </body>
+  <script>
+    var csrf_token = "{{ csrf_token() }}";
+    const headers = new Headers({
+        'Content-Type': 'x-www-form-urlencoded',
+        'X-CSRF-TOKEN': csrf_token
+    });
+  </script>
   {% block script %}{% endblock %}
   {% block data %}{% endblock %}
 </html>

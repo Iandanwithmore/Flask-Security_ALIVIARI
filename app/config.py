@@ -3,11 +3,11 @@ class Config(object):
     TESTING = False
     SECRET_KEY = "BatmanisBruceWayne"
 
-    LOG_FILE = "log/front_server.log"
+    LOG_FILE = "/var/log/front_server.log"
 
     ALLOWED_EXTENSIONS = {"pdf", "png", "jpg", "jpeg", "csv"}
     MAX_CONTENT_LENGTH = 16000
-    PATH_FILE = "C:/xampp/htdocs/CLANAD/Docs/PACIENTE"
+    PATH_FILE = "mnt/Docs/PACIENTE"
 
     APP_PORT = "8001"
     API_URL = "http://127.0.0.1:4000"

@@ -62,7 +62,7 @@
   </div>
   
   <form class="form" id="p_mdatos">
-
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <div class="container">
     {% set id = namespace(value=0) %}
     {% for laDatos in saDatos %}
