@@ -24,50 +24,17 @@ from flask import (
 
 Actividad = Blueprint("Actividad", __name__)
 
-
-def get_or_create_eventloop():
-    try:
-        return asyncio.get_event_loop()
-    except RuntimeError as ex:
-        if "There is no current event loop in thread" in str(
-            ex
-        ) or "Event loop is closed" in str(ex):
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            return asyncio.get_event_loop()
-
-
-def fetch_async(urls):
-    """Fetch list of web pages asynchronously."""
-    loop = get_or_create_eventloop()  # event loop
-    future = asyncio.ensure_future(fetch_all(urls, loop))  # tasks to do
-    done = loop.run_until_complete(future)  # loop until done
-    # loop.close()
-    return done
-
-
-async def fetch_all(urls, loop):
-    tasks = []  # dictionary of start times for each url
-    for url in urls:
-        task = loop.run_in_executor(None, requests.get, url)
-        tasks.append(task)  # create list of tasks
-    done = await asyncio.gather(*tasks)  # gather task responses
-    # done = asyncio.wait(*tasks)
-    return done
-
-
-@Actividad.route("/act_lab", methods=["GET"])
-@Actividad.route("/act_ray", methods=["GET"])
-@Actividad.route("/act_med", methods=["GET"])
-@Actividad.route("/act_tri", methods=["GET"])
-@Actividad.route("/act_car", methods=["GET"])
-@Actividad.route("/act_aud", methods=["GET"])
-@Actividad.route("/act_esp", methods=["GET"])
-@Actividad.route("/act_oft", methods=["GET"])
-@Actividad.route("/act_psi", methods=["GET"])
-@Actividad.route("/act_eco", methods=["GET"])
-@Actividad.route("/act_nut", methods=["GET"])
-@Actividad.route("/act_odo", methods=["GET"])
+@Actividad.get("/act_lab")
+@Actividad.get("/act_ray")
+@Actividad.get("/act_med")
+@Actividad.get("/act_tri")
+@Actividad.get("/act_car")
+@Actividad.get("/act_aud")
+@Actividad.get("/act_oft")
+@Actividad.get("/act_psi")
+@Actividad.get("/act_eco")
+@Actividad.get("/act_nut")
+@Actividad.get("/act_odo")
 def route_act():
     laservice = {
         "/act_lab": "L",
@@ -88,8 +55,7 @@ def route_act():
         lcTipSer = laservice[request.path]
     return redirect(url_for("Actividad.actividades", pcTipSer=lcTipSer))
 
-
-@Actividad.route("/actividades/<string:pcTipSer>", methods=["GET"])
+@Actividad.get("/actividades/<string:pcTipSer>")
 @val_session_routes_factory
 @login_required
 def actividades(pcTipSer):
@@ -127,10 +93,8 @@ def actividades(pcTipSer):
         flash(err, "error")
         return redirect(url_for("Login.main"))
 
-
-@Actividad.route(
-    "/actividades/<string:pcTipSer>/<int:pnIndice>", methods=["GET", "POST"]
-)
+@Actividad.get("/actividades/<string:pcTipSer>/<int:pnIndice>")
+@Actividad.post("/actividades/<string:pcTipSer>/<int:pnIndice>")
 # @login_required
 def detalleActividad(pcTipSer, pnIndice):
     lcCodUsu = session["CCODUSU"]
@@ -169,8 +133,7 @@ def detalleActividad(pcTipSer, pnIndice):
             for url in urls:
                 r = s.get(url)
                 R0.append(r.json())
-            if not R0[0]["OK"]:
-                raise ValueError("NO SE CARGO DETALLE DE LA ACTIVIDAD")
+            assert not R0[0]["OK"],"NO SE CARGO DETALLE DE LA ACTIVIDAD"
             if R0[1]["OK"]:
                 session["paCie10"] = R0[1]["DATA"]
             if not R0[2]["OK"]:
@@ -224,8 +187,7 @@ def detalleActividad(pcTipSer, pnIndice):
             llOk = requests.post(
                 current_app.config["API_URL"] + "/actividad/detalle", json=loJson
             ).json()
-            if not llOk["OK"]:
-                raise ValueError(llOk["DATA"])
+            assert not llOk["OK"],llOk["DATA"]
             return redirect(url_for("Login.main"))
     except Exception as e:
         traceback.print_exc()
@@ -233,8 +195,7 @@ def detalleActividad(pcTipSer, pnIndice):
         flash(err, "error")
     return redirect(url_for("Login.main"))
 
-
-@Actividad.route("/actividades/<string:pcTipSer>/ZIP", methods=["GET"])
+@Actividad.get("/actividades/<string:pcTipSer>/ZIP")
 # @login_required
 def zip_actividad(pcTipSer):
     try:
@@ -275,8 +236,7 @@ def zip_actividad(pcTipSer):
         flash(err, "error")
         return redirect(url_for("Login.main"))
 
-
-@Actividad.route("/PDF/<string:pcNroDni>/<string:pcCodact>", methods=["GET"])
+@Actividad.get("/PDF/<string:pcNroDni>/<string:pcCodact>")
 # @login_required
 def pdf_actividad_id(pcNroDni, pcCodact):
     try:
@@ -293,10 +253,7 @@ def pdf_actividad_id(pcNroDni, pcCodact):
         flash(err, "error")
         return redirect(url_for("Login.main"))
 
-
-@Actividad.route(
-    "/actividades/<string:pcTipSer>/PDF/<string:pnIndice>", methods=["GET"]
-)
+@Actividad.get("/actividades/<string:pcTipSer>/PDF/<string:pnIndice>")
 # @login_required
 def pdf_actividad(pcTipSer, pnIndice):
     try:
@@ -314,8 +271,7 @@ def pdf_actividad(pcTipSer, pnIndice):
         flash(err, "error")
         return redirect(url_for("Login.main"))
 
-
-@Actividad.route("/buscar/cie10/<string:pcParam>", methods=["GET"])
+@Actividad.get("/buscar/cie10/<string:pcParam>")
 @login_required
 def buscararcie10(pcParam):
     try:
@@ -327,16 +283,15 @@ def buscararcie10(pcParam):
             llOk = requests.get(
                 current_app.config["API_URL"] + "/cie10", params=laData
             ).json()
-            if not llOk["OK"]:
-                raise ValueError(llOk["DATA"])
+            assert not llOk["OK"],llOk["DATA"]
             session["TMP"] = llOk["DATA"]
             return jsonify(llOk), 200
     except Exception as err:
         traceback.print_exc()
         return abort(400, {"OK": 0, "DATA": str(err)})
 
-
-@Actividad.route("/agregar/cie10/<int:pnIndice>", methods=["GET", "POST"])
+@Actividad.get("/agregar/cie10/<int:pnIndice>")
+@Actividad.post("/agregar/cie10/<int:pnIndice>")
 # @login_required
 def agregarcie10(pnIndice):
     try:
@@ -359,8 +314,7 @@ def agregarcie10(pnIndice):
         traceback.print_exc()
         return abort(400, {"OK": 0, "DATA": str(err)})
 
-
-@Actividad.route("/quitar/cie10/<int:pnIndice>", methods=["POST"])
+@Actividad.post("/quitar/cie10/<int:pnIndice>")
 # @login_required
 def quitarcie10(pnIndice):
     try:
@@ -372,8 +326,7 @@ def quitarcie10(pnIndice):
         traceback.print_exc()
         return abort(400, {"OK": 0, "DATA": str(err)})
 
-
-@Actividad.route("/plan/hoja_ruta", methods=["GET"])
+@Actividad.get("/plan/hoja_ruta")
 @val_session_routes_factory
 @login_required
 def plan_actividades():
@@ -386,8 +339,8 @@ def plan_actividades():
     session["paExamen"] = llOk["DATA"]
     return jsonify({"OK": 1, "DATA": session["paExamen"]}), 200
 
-
-@Actividad.route("/test", methods=["GET", "POST"])
+@Actividad.get("/test")
+@Actividad.post("/test")
 # @login_required
 def codigo_hash():
     try:
@@ -403,8 +356,8 @@ def codigo_hash():
         traceback.print_exc()
         return abort(400, {"OK": 0, "DATA": str(err)})
 
-
-@Actividad.route("/verArchivo", methods=["GET", "POST"])
+@Actividad.get("/verArchivo")
+@Actividad.post("/verArchivo")
 # @login_required
 def ver_archivo_por_codigo():
     try:

@@ -1,6 +1,3 @@
-
-
-
-xlsxwriter
-psycopg2
-pyfpdf
+rsa
+flask_wtf
+Flask-Session

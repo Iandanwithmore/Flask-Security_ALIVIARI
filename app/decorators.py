@@ -1,6 +1,8 @@
 import functools
+import inspect
+import traceback
 
-from flask import current_app, redirect, request, session, url_for
+from flask import current_app, flash, redirect, request, session, url_for
 
 
 def login_required(func):
@@ -25,38 +27,27 @@ def val_session_routes_factory(func):
     return secure_function
 
 
-def exception_handler_request(func) -> object:
-    @functools.wraps(func)
-    def inner_function(*args, **kwargs):
-        R1 = {"OK": 0, "DATA": ""}
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            print("-" * 60)
-            print(e.__class__.__name__)
-            traceback.print_exc()
-            print("-" * 60)
-            if e.__class__.__name__ in [
-                "ValueError",
-                "AssertionError",
-                "KeyError",
-                "TypeError",
-            ]:
-                R1["DATA"] = str(e)
-                return jsonify(R1), 400
-            else:
-                R1["DATA"] = str(e)
-                return jsonify(R1), 500
+def exception_handler(error_response):
+    def factory_exception(func):
+        @functools.wraps(func)
+        def inner_function(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                print("-" * 60)
+                print(f"CALLER: {inspect.stack()[1][2]}-{inspect.stack()[1][3]}()")
+                print(e.__class__.__name__)
+                traceback.print_exc()
+                print("-" * 60)
+                if e.__class__.__name__ in [
+                    "ValueError",
+                    "AssertionError",
+                    "KeyError",
+                    "TypeError",
+                ]:
+                    flash(str(e), "error")
+                    return redirect(url_for(error_response))
 
-    return inner_function
+        return inner_function
 
-
-# def val_session_routes_factory(opc):
-#     def val_session_routes(function):
-#         def wrapper(*args, **kwargs):
-#             if opc not in session['ROUTES']:
-#                 return redirect(url_for("login", next=request.url))
-#             result = function(*args, **kwargs)
-#             return result
-#         return wrapper
-#     return val_session_routes
+    return factory_exception
